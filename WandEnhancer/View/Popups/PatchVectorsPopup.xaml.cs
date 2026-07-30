@@ -66,6 +66,23 @@ namespace WandEnhancer.View.Popups
             UpdateScriptsEmptyState();
         }
 
+        private void OnActivateProChecked(object sender, RoutedEventArgs e)
+        {
+            SetAutoRenewVisibility(Visibility.Visible);
+        }
+
+        private void OnActivateProUnchecked(object sender, RoutedEventArgs e)
+        {
+            AutoRenewProBox.IsChecked = false;
+            SetAutoRenewVisibility(Visibility.Collapsed);
+        }
+
+        private void SetAutoRenewVisibility(Visibility visibility)
+        {
+            AutoRenewProLabel.Visibility = visibility;
+            AutoRenewProBox.Visibility = visibility;
+        }
+
         private void OnPatchButtonClick(object sender, RoutedEventArgs e)
         {
             if (ActivateProBox.IsChecked != true && DisableUpdateBox.IsChecked != true &&
@@ -103,6 +120,9 @@ namespace WandEnhancer.View.Popups
 
             if (AutoRenewProBox.IsChecked == true)
             {
+                // AutoRenewPro is a modifier of ActivatePro, not a standalone patch.
+                // When auto-renew is enabled, Pro activation must also be applied.
+                result.Add(EPatchType.ActivatePro);
                 result.Add(EPatchType.AutoRenewPro);
             }
 

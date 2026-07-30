@@ -131,7 +131,10 @@ namespace WandEnhancer.Core
                 throw new Exception("[ENHANCER] No app bundle found");
             }
             
-            var remainingPatches = new HashSet<EPatchType>(_config.PatchTypes);
+            // AutoRenewPro is a modifier (not a standalone patch key in enhancerConfig).
+            // Its behaviour is already captured by the autoRenew parameter passed to GetInstance().
+            var remainingPatches = new HashSet<EPatchType>(
+                _config.PatchTypes.Where(t => t != EPatchType.AutoRenewPro));
             var enhancerConfig = EnhancerConfig.GetInstance(_config.PatchTypes);
 
             foreach (var item in items)
