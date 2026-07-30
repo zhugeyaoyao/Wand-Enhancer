@@ -82,13 +82,9 @@ namespace WandEnhancer.View.Popups
 
         private void SetAutoRenewVisibility(Visibility visibility)
         {
-            if (AutoRenewProLabel != null)
+            if (AutoRenewProRow != null)
             {
-                AutoRenewProLabel.Visibility = visibility;
-            }
-            if (AutoRenewProBox != null)
-            {
-                AutoRenewProBox.Visibility = visibility;
+                AutoRenewProRow.Visibility = visibility;
             }
         }
 

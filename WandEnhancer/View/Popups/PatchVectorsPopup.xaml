@@ -32,14 +32,15 @@
             <CheckBox Grid.Row="0" Grid.Column="1" x:Name="ActivateProBox" HorizontalAlignment="Right" VerticalAlignment="Center"
                       IsChecked="True" Checked="OnActivateProChecked" Unchecked="OnActivateProUnchecked" />
 
-            <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center"
-                       x:Name="AutoRenewProLabel"
-                       Text="{DynamicResource pv_auto_renew_pro}"
-                       Margin="20 0 0 0"
-                       Foreground="{DynamicResource MutedForeground}"
-                       FontSize="12" />
-            <CheckBox Grid.Row="1" Grid.Column="1" x:Name="AutoRenewProBox" HorizontalAlignment="Right" VerticalAlignment="Center"
-                      Visibility="Visible" />
+            <DockPanel Grid.Row="1" Grid.ColumnSpan="2"
+                       x:Name="AutoRenewProRow" Visibility="Visible">
+                <CheckBox x:Name="AutoRenewProBox" DockPanel.Dock="Right" VerticalAlignment="Center" />
+                <TextBlock VerticalAlignment="Center"
+                           Text="{DynamicResource pv_auto_renew_pro}"
+                           Margin="20 0 0 0"
+                           Foreground="{DynamicResource MutedForeground}"
+                           FontSize="12" />
+            </DockPanel>
 
             <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Text="{DynamicResource pv_devtools}" />
             <CheckBox Grid.Row="2" Grid.Column="1" x:Name="DevToolsHotkeyBox" HorizontalAlignment="Right" VerticalAlignment="Center" />
