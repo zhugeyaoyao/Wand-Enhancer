@@ -47,7 +47,7 @@ namespace WandEnhancer.Core
         {
             var parameters = RequireGroup(match, "params", "setAccountLanguage");
             var expr = RequireGroup(match, "expr", "setAccountLanguage");
-            return $"setAccountLanguage({parameters}){{return ({expr}).then(response=>{{response&&\"object\"==typeof response&&(response.subscription={{period:\"yearly\",state:\"active\"}});return response;}})}}";
+            return $"setAccountLanguage({parameters}){{return ({expr}).then(response=>{{response&&\"object\"==typeof response&&(response.subscription={{period:\"yearly\",state:\"active\",startedAt:new Date(Date.now()-864e5).toISOString(),endsAt:new Date(Date.now()+31536e6).toISOString()}});return response;}})}}";
         }
 
         private static string BuildSetAccountReducerPatch(Match match)
@@ -58,7 +58,7 @@ namespace WandEnhancer.Core
             var state = RequireGroup(match, "state", "setAccountReducer");
             var account = RequireGroup(match, "account", "setAccountReducer");
             return
-                $"const {decl}=\"ACTION_SET_ACCOUNT\";function {fn}({parameters}){{const a={account}&&\"object\"==typeof {account}?{{...{account},subscription:{{period:\"yearly\",state:\"active\"}}}}:{account};return{{...{state},account:a}}}}";
+                $"const {decl}=\"ACTION_SET_ACCOUNT\";function {fn}({parameters}){{const a={account}&&\"object\"==typeof {account}?{{...{account},subscription:{{period:\"yearly\",state:\"active\",startedAt:new Date(Date.now()-864e5).toISOString(),endsAt:new Date(Date.now()+31536e6).toISOString()}}}}:{account};return{{...{state},account:a}}}}";
         }
 
         private static string BuildRemoteBridgeResetPatch(Match match)
@@ -121,7 +121,7 @@ namespace WandEnhancer.Core
                             Target = new Regex(@"getUserAccount\(\)\{.*?return\s+this\.#\w+\.fetch\(\{.*?\}\)\}",
                                 RegexOptions.Singleline),
                             Patch =
-                                "getUserAccount(){return this.#<service_name>.fetch({endpoint:\"/v3/account\",method:\"GET\",name:\"/v3/account\",collectMetrics:0}).then(response=>{response.subscription={period:\"yearly\",state:\"active\"};return response;})}"
+                                "getUserAccount(){return this.#<service_name>.fetch({endpoint:\"/v3/account\",method:\"GET\",name:\"/v3/account\",collectMetrics:0}).then(response=>{response.subscription={period:\"yearly\",state:\"active\",startedAt:new Date(Date.now()-864e5).toISOString(),endsAt:new Date(Date.now()+31536e6).toISOString()};return response;})}"
                         },
                         new PatchEntry
                         {
@@ -140,7 +140,7 @@ namespace WandEnhancer.Core
                                 @"setAccountWandBrandExperience\(\)\{.*?return\s+this\.#\w+\.post\(""/v3/account/brand_experience_wand""\)\}",
                                 RegexOptions.Singleline),
                             Patch =
-                                "setAccountWandBrandExperience(){return this.#<service_name>.post(\"/v3/account/brand_experience_wand\").then(response=>{response.subscription={period:\"yearly\",state:\"active\"};return response;})}"
+                                "setAccountWandBrandExperience(){return this.#<service_name>.post(\"/v3/account/brand_experience_wand\").then(response=>{response.subscription={period:\"yearly\",state:\"active\",startedAt:new Date(Date.now()-864e5).toISOString(),endsAt:new Date(Date.now()+31536e6).toISOString()};return response;})}"
                         },
                         new PatchEntry
                         {
