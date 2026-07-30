@@ -13,7 +13,8 @@ namespace WandEnhancer.Models
         DisableTelemetry = 4,
         DevToolsOnF12 = 8,
         RemoteWebPanelPreview = 16,
-        RemovePromoBanner = 32
+        RemovePromoBanner = 32,
+        AutoRenewPro = 64
     }
     
     public sealed class PatchConfig

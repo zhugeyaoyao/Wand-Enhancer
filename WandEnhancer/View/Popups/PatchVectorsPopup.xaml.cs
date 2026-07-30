@@ -70,7 +70,7 @@ namespace WandEnhancer.View.Popups
         {
             if (ActivateProBox.IsChecked != true && DisableUpdateBox.IsChecked != true &&
                 DevToolsHotkeyBox.IsChecked != true && RemoteWebPanelPreviewBox.IsChecked != true &&
-                RemovePromoBannerBox.IsChecked != true)
+                RemovePromoBannerBox.IsChecked != true && AutoRenewProBox.IsChecked != true)
             {
                 return;
             }
@@ -99,6 +99,11 @@ namespace WandEnhancer.View.Popups
             if (RemovePromoBannerBox.IsChecked == true)
             {
                 result.Add(EPatchType.RemovePromoBanner);
+            }
+
+            if (AutoRenewProBox.IsChecked == true)
+            {
+                result.Add(EPatchType.AutoRenewPro);
             }
 
             _onApply(new PatchConfig

@@ -31,6 +31,7 @@
     <s:String x:Key="pv_disable_updates">Disable updates</s:String>
     <s:String x:Key="pv_remote_web_panel_preview">Enable remote access (beta)</s:String>
     <s:String x:Key="pv_remove_promo_banner">Remove bottom promotion banner</s:String>
+    <s:String x:Key="pv_auto_renew_pro">Pro auto-renewal (keep subscription alive)</s:String>
     <s:String x:Key="pv_custom_scripts">Custom scripts</s:String>
     <s:String x:Key="pv_add_js_scripts">Add .js</s:String>
     <s:String x:Key="pv_custom_scripts_hint">Selected .js files are packed into Wand and loaded in the renderer.</s:String>

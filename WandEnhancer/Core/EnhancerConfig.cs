@@ -43,23 +43,6 @@ namespace WandEnhancer.Core
             return RequireGroup(match, groupName, patchName);
         }
 
-        private static string BuildSetAccountLanguagePatch(Match match)
-        {
-            var parameters = RequireGroup(match, "params", "setAccountLanguage");
-            var expr = RequireGroup(match, "expr", "setAccountLanguage");
-            return $"setAccountLanguage({parameters}){{return ({expr}).then(response=>{{if(response&&\"object\"==typeof response){{let n=Date.now(),d=n;if(response.subscription&&response.subscription.endsAt){{let t=new Date(response.subscription.endsAt).getTime();if(t>=n)return response;d=t}}response.subscription={{period:\"yearly\",state:\"active\",startedAt:new Date(d).toISOString(),endsAt:new Date(d+31536e6).toISOString()}}}};return response;}})}}";
-        }
-
-        private static string BuildSetAccountReducerPatch(Match match)
-        {
-            var decl = RequireGroup(match, "decl", "setAccountReducer");
-            var fn = RequireGroup(match, "fn", "setAccountReducer");
-            var parameters = RequireGroup(match, "params", "setAccountReducer");
-            var state = RequireGroup(match, "state", "setAccountReducer");
-            var account = RequireGroup(match, "account", "setAccountReducer");
-            return
-                $"const {decl}=\"ACTION_SET_ACCOUNT\";function {fn}({parameters}){{const a={account}&&\"object\"==typeof {account}?{{...{account},subscription:(()=>{{let n=Date.now(),d=n;if({account}.subscription&&{account}.subscription.endsAt){{let t=new Date({account}.subscription.endsAt).getTime();if(t>=n)return{account}.subscription;d=t}}return{{period:\"yearly\",state:\"active\",startedAt:new Date(d).toISOString(),endsAt:new Date(d+31536e6).toISOString()}}}})()}}:{account};return{{...{state},account:a}}}}";
-        }
 
         private static string BuildRemoteBridgeResetPatch(Match match)
         {
@@ -97,8 +80,14 @@ namespace WandEnhancer.Core
             return $"{method}(){{let e,t=!1,s=this.{trainerField}?.getMetadata({metadataExport})?.gameVersion??null,o=!1;const n=this.{notesField}[this.{trainerIdField}??\"\"]||null;this.{gameField}&&(e=this.{installationField}.getPreferredInstallationInfo(this.{gameField}),e.app&&(t=!0,s??=e.version??null,o=\"number\"==typeof e.version&&!this.{supportedVersionsField}.includes(e.version)));this.status==={statusAlias}.Connected&&this.{remoteChannelField}?.send(\"client-state\",{{instanceId:this.{instanceField},trainerId:this.{trainerIdField},trainerLoading:this.{trainerField}?.isLoading(),gameInstalled:t,gameVersion:s,needsCompatibilityWarning:o,values:this.{valuesMethod}(),themeId:this.{themeField},settings:{settingsHelper}(this.settings),language:this.{languageField},accountUuid:this.account.uuid,notesReadHash:n,isTimeLimitExpired:\"expired\"===this.{timerField}.timerState}});this.__wandRemoteBridge?.sync({{instanceId:this.{instanceField},trainerId:this.{trainerIdField},trainerInfo:this.__wandRemoteTrainerInfo??null,metadata:this.{trainerField}?.getMetadata({metadataExport})??null,trainerLoading:this.{trainerField}?.isLoading()??false,gameInstalled:t,gameVersion:s,needsCompatibilityWarning:o,language:this.{languageField},themeId:this.{themeField},notesReadHash:n,isTimeLimitExpired:\"expired\"===this.{timerField}.timerState,values:this.{valuesMethod}()}})}}";
         }
 
-        public static Dictionary<EPatchType, PatchEntry[]> GetInstance()
+        public static Dictionary<EPatchType, PatchEntry[]> GetInstance(ISet<EPatchType> enabledTypes = null)
         {
+            var autoRenew = enabledTypes != null && enabledTypes.Contains(EPatchType.AutoRenewPro);
+            string guard = autoRenew
+                ? "let n=Date.now(),d=n;if(response.subscription&&response.subscription.endsAt){let t=new Date(response.subscription.endsAt).getTime();if(t>=n)return response;d=t}"
+                : "if(response.subscription&&response.subscription.endsAt)return response;let n=Date.now(),d=n;";
+            string subObj = @"{period:""yearly"",state:""active"",startedAt:new Date(d).toISOString(),endsAt:new Date(d+31536e6).toISOString()}";
+
             return new Dictionary<EPatchType, PatchEntry[]>()
             {
                 {
@@ -121,7 +110,7 @@ namespace WandEnhancer.Core
                             Target = new Regex(@"getUserAccount\(\)\{.*?return\s+this\.#\w+\.fetch\(\{.*?\}\)\}",
                                 RegexOptions.Singleline),
                             Patch =
-                                "getUserAccount(){return this.#<service_name>.fetch({endpoint:\"/v3/account\",method:\"GET\",name:\"/v3/account\",collectMetrics:0}).then(response=>{let n=Date.now(),d=n;if(response.subscription&&response.subscription.endsAt){let t=new Date(response.subscription.endsAt).getTime();if(t>=n)return response;d=t}response.subscription={period:\"yearly\",state:\"active\",startedAt:new Date(d).toISOString(),endsAt:new Date(d+31536e6).toISOString()};return response;})}"
+                                $"getUserAccount(){{return this.#<service_name>.fetch({{endpoint:\"/v3/account\",method:\"GET\",name:\"/v3/account\",collectMetrics:0}}).then(response=>{{{guard}response.subscription={subObj};return response;}})}}"
                         },
                         new PatchEntry
                         {
@@ -140,7 +129,7 @@ namespace WandEnhancer.Core
                                 @"setAccountWandBrandExperience\(\)\{.*?return\s+this\.#\w+\.post\(""/v3/account/brand_experience_wand""\)\}",
                                 RegexOptions.Singleline),
                             Patch =
-                                "setAccountWandBrandExperience(){return this.#<service_name>.post(\"/v3/account/brand_experience_wand\").then(response=>{let n=Date.now(),d=n;if(response.subscription&&response.subscription.endsAt){let t=new Date(response.subscription.endsAt).getTime();if(t>=n)return response;d=t}response.subscription={period:\"yearly\",state:\"active\",startedAt:new Date(d).toISOString(),endsAt:new Date(d+31536e6).toISOString()};return response;})}"
+                                $"setAccountWandBrandExperience(){{return this.#<service_name>.post(\"/v3/account/brand_experience_wand\").then(response=>{{{guard}response.subscription={subObj};return response;}})}}"
                         },
                         new PatchEntry
                         {
@@ -153,7 +142,12 @@ namespace WandEnhancer.Core
                             Target = new Regex(
                                 @"setAccountLanguage\((?<params>[^)]*)\)\{\s*return\s+(?<expr>this\.#\w+\.post\(""/v3/account/language"",\{[^}]*\}\))\s*;?\s*\}",
                                 RegexOptions.Singleline),
-                            PatchFactory = BuildSetAccountLanguagePatch
+                            PatchFactory = match =>
+                            {
+                                var parameters = RequireGroup(match, "params", "setAccountLanguage");
+                                var expr = RequireGroup(match, "expr", "setAccountLanguage");
+                                return $"setAccountLanguage({parameters}){{return ({expr}).then(response=>{{if(response&&\"object\"==typeof response){{{guard}response.subscription={subObj}}};return response;}})}}";
+                            }
                         },
                         new PatchEntry
                         {
@@ -166,7 +160,18 @@ namespace WandEnhancer.Core
                             Target = new Regex(
                                 @"const (?<decl>\w+)=""ACTION_SET_ACCOUNT"";function (?<fn>\w+)\((?<params>[^)]*)\)\{return\{\.\.\.(?<state>\w+),account:(?<account>\w+)\}\}",
                                 RegexOptions.Singleline),
-                            PatchFactory = BuildSetAccountReducerPatch
+                            PatchFactory = match =>
+                            {
+                                var decl = RequireGroup(match, "decl", "setAccountReducer");
+                                var fn = RequireGroup(match, "fn", "setAccountReducer");
+                                var parameters = RequireGroup(match, "params", "setAccountReducer");
+                                var state = RequireGroup(match, "state", "setAccountReducer");
+                                var account = RequireGroup(match, "account", "setAccountReducer");
+                                string accGuard = autoRenew
+                                    ? $"let n=Date.now(),d=n;if({account}.subscription&&{account}.subscription.endsAt){{let t=new Date({account}.subscription.endsAt).getTime();if(t>=n)return{account}.subscription;d=t}}"
+                                    : $"if({account}.subscription&&{account}.subscription.endsAt)return{account}.subscription;let n=Date.now(),d=n;";
+                                return $"const {decl}=\"ACTION_SET_ACCOUNT\";function {fn}({parameters}){{const a={account}&&\"object\"==typeof {account}?{{...{account},subscription:(()=>{{{accGuard}return{subObj};}})()}}:{account};return{{...{state},account:a}}}}";
+                            }
                         },
                         new PatchEntry
                         {

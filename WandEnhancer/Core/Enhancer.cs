@@ -131,7 +131,7 @@ namespace WandEnhancer.Core
             }
             
             var remainingPatches = new HashSet<EPatchType>(_config.PatchTypes);
-            var enhancerConfig = EnhancerConfig.GetInstance();
+            var enhancerConfig = EnhancerConfig.GetInstance(_config.PatchTypes);
 
             foreach (var item in items)
             {
