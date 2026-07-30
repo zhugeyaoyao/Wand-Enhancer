@@ -73,14 +73,23 @@ namespace WandEnhancer.View.Popups
 
         private void OnActivateProUnchecked(object sender, RoutedEventArgs e)
         {
-            AutoRenewProBox.IsChecked = false;
+            if (AutoRenewProBox != null)
+            {
+                AutoRenewProBox.IsChecked = false;
+            }
             SetAutoRenewVisibility(Visibility.Collapsed);
         }
 
         private void SetAutoRenewVisibility(Visibility visibility)
         {
-            AutoRenewProLabel.Visibility = visibility;
-            AutoRenewProBox.Visibility = visibility;
+            if (AutoRenewProLabel != null)
+            {
+                AutoRenewProLabel.Visibility = visibility;
+            }
+            if (AutoRenewProBox != null)
+            {
+                AutoRenewProBox.Visibility = visibility;
+            }
         }
 
         private void OnPatchButtonClick(object sender, RoutedEventArgs e)
