@@ -227,10 +227,10 @@ namespace WandEnhancer.Core
                     {
                         new PatchEntry
                         {
-                            // Intercept getPromotion() API response and nullify the bottom
+                            // Intercept getPromotions() API response and nullify the bottom
                             // appBanner component so the promotional banner never renders.
-                            Name = "getPromotion",
-                            SearchHints = new[] { "getPromotion()", "/v3/promotion" },
+                            Name = "getPromotions",
+                            SearchHints = new[] { "getPromotions()", "/v3/promotions" },
                             Resolver = new ResolveContext
                             {
                                 Handler = (targetFunction) =>
@@ -241,10 +241,9 @@ namespace WandEnhancer.Core
                                 Placeholder = "<service_name>"
                             },
                             Target = new Regex(
-                                @"getPromotion\(\)\{.*?return\s+this\.#\w+\.fetch\(\{.*?\}\)\}",
-                                RegexOptions.Singleline),
+                                @"getPromotions\(\)\{return this\.#\w+\.fetch\(\{endpoint:""/v3/promotions"",method:""GET"",name:""/v3/promotions"",collectMetrics:!1\}\)\}"),
                             Patch =
-                                "getPromotion(){return this.#<service_name>.fetch({endpoint:\"/v3/promotion\",method:\"GET\",name:\"/v3/promotion\",collectMetrics:!1}).then(response=>{response.components.appBanner=null;response.flags=0;return response;})}"
+                                "getPromotions(){return this.#<service_name>.fetch({endpoint:\"/v3/promotions\",method:\"GET\",name:\"/v3/promotions\",collectMetrics:!1}).then(response=>{response.components&&(response.components.appBanner=null);return response;})}"
                         }
                     }
                 },
