@@ -47,7 +47,7 @@ namespace WandEnhancer.Core
         {
             var parameters = RequireGroup(match, "params", "setAccountLanguage");
             var expr = RequireGroup(match, "expr", "setAccountLanguage");
-            return $"setAccountLanguage({parameters}){{return ({expr}).then(response=>{{if(response&&\"object\"==typeof response){{let n=Date.now(),d=n;response.subscription&&response.subscription.endsAt&&new Date(response.subscription.endsAt).getTime()<n&&(d=new Date(response.subscription.endsAt).getTime());response.subscription={{period:\"yearly\",state:\"active\",startedAt:new Date(d).toISOString(),endsAt:new Date(d+31536e6).toISOString()}}}};return response;}})}}";
+            return $"setAccountLanguage({parameters}){{return ({expr}).then(response=>{{if(response&&\"object\"==typeof response){{let n=Date.now(),d=n;if(response.subscription&&response.subscription.endsAt){{let t=new Date(response.subscription.endsAt).getTime();if(t>=n)return response;d=t}}response.subscription={{period:\"yearly\",state:\"active\",startedAt:new Date(d).toISOString(),endsAt:new Date(d+31536e6).toISOString()}}}};return response;}})}}";
         }
 
         private static string BuildSetAccountReducerPatch(Match match)
@@ -58,7 +58,7 @@ namespace WandEnhancer.Core
             var state = RequireGroup(match, "state", "setAccountReducer");
             var account = RequireGroup(match, "account", "setAccountReducer");
             return
-                $"const {decl}=\"ACTION_SET_ACCOUNT\";function {fn}({parameters}){{const a={account}&&\"object\"==typeof {account}?{{...{account},subscription:(()=>{{let n=Date.now(),d=n;{account}.subscription&&{account}.subscription.endsAt&&new Date({account}.subscription.endsAt).getTime()<n&&(d=new Date({account}.subscription.endsAt).getTime());return{{period:\"yearly\",state:\"active\",startedAt:new Date(d).toISOString(),endsAt:new Date(d+31536e6).toISOString()}}}})()}}:{account};return{{...{state},account:a}}}}";
+                $"const {decl}=\"ACTION_SET_ACCOUNT\";function {fn}({parameters}){{const a={account}&&\"object\"==typeof {account}?{{...{account},subscription:(()=>{{let n=Date.now(),d=n;if({account}.subscription&&{account}.subscription.endsAt){{let t=new Date({account}.subscription.endsAt).getTime();if(t>=n)return{account}.subscription;d=t}}return{{period:\"yearly\",state:\"active\",startedAt:new Date(d).toISOString(),endsAt:new Date(d+31536e6).toISOString()}}}})()}}:{account};return{{...{state},account:a}}}}";
         }
 
         private static string BuildRemoteBridgeResetPatch(Match match)
@@ -121,7 +121,7 @@ namespace WandEnhancer.Core
                             Target = new Regex(@"getUserAccount\(\)\{.*?return\s+this\.#\w+\.fetch\(\{.*?\}\)\}",
                                 RegexOptions.Singleline),
                             Patch =
-                                "getUserAccount(){return this.#<service_name>.fetch({endpoint:\"/v3/account\",method:\"GET\",name:\"/v3/account\",collectMetrics:0}).then(response=>{let n=Date.now(),d=n;response.subscription&&response.subscription.endsAt&&new Date(response.subscription.endsAt).getTime()<n&&(d=new Date(response.subscription.endsAt).getTime());response.subscription={period:\"yearly\",state:\"active\",startedAt:new Date(d).toISOString(),endsAt:new Date(d+31536e6).toISOString()};return response;})}"
+                                "getUserAccount(){return this.#<service_name>.fetch({endpoint:\"/v3/account\",method:\"GET\",name:\"/v3/account\",collectMetrics:0}).then(response=>{let n=Date.now(),d=n;if(response.subscription&&response.subscription.endsAt){let t=new Date(response.subscription.endsAt).getTime();if(t>=n)return response;d=t}response.subscription={period:\"yearly\",state:\"active\",startedAt:new Date(d).toISOString(),endsAt:new Date(d+31536e6).toISOString()};return response;})}"
                         },
                         new PatchEntry
                         {
@@ -140,7 +140,7 @@ namespace WandEnhancer.Core
                                 @"setAccountWandBrandExperience\(\)\{.*?return\s+this\.#\w+\.post\(""/v3/account/brand_experience_wand""\)\}",
                                 RegexOptions.Singleline),
                             Patch =
-                                "setAccountWandBrandExperience(){return this.#<service_name>.post(\"/v3/account/brand_experience_wand\").then(response=>{let n=Date.now(),d=n;response.subscription&&response.subscription.endsAt&&new Date(response.subscription.endsAt).getTime()<n&&(d=new Date(response.subscription.endsAt).getTime());response.subscription={period:\"yearly\",state:\"active\",startedAt:new Date(d).toISOString(),endsAt:new Date(d+31536e6).toISOString()};return response;})}"
+                                "setAccountWandBrandExperience(){return this.#<service_name>.post(\"/v3/account/brand_experience_wand\").then(response=>{let n=Date.now(),d=n;if(response.subscription&&response.subscription.endsAt){let t=new Date(response.subscription.endsAt).getTime();if(t>=n)return response;d=t}response.subscription={period:\"yearly\",state:\"active\",startedAt:new Date(d).toISOString(),endsAt:new Date(d+31536e6).toISOString()};return response;})}"
                         },
                         new PatchEntry
                         {
